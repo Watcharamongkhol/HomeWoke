@@ -2,45 +2,70 @@
 <html>
 <head>
 <style>
-.error {color: #FF0000;}
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  padding: 20px;
+  background-color: #f9f9f9;
+}
+.error {
+  color: #FF0000;
+}
+h2 {
+  color: #333;
+}
+form {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+input[type="text"], textarea {
+  width: 100%;
+  padding: 8px;
+  margin: 8px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+input[type="submit"] {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+input[type="submit"]:hover {
+  background-color: #45a049;
+}
 </style>
 </head>
 <body>  
 
 <?php
-// define variables and set to empty values
-$nameErr = $emailErr = $genderErr = $websiteErr = "";
-$name = $email = $gender = $comment = $website = "";
+$nameErr = $nicknameErr = $genderErr = $houseNoErr = "";
+$name = $nickname = $gender = $comment = $houseNo = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if (empty($_POST["name"])) {
-    $nameErr = "Name is required";
+    $nameErr = "จำเป็นต้องกรอกชื่อ";
   } else {
     $name = test_input($_POST["name"]);
-    // check if name only contains letters and whitespace
-    if (!preg_match("/^[a-zA-Z-' ]*$/",$name)) {
-      $nameErr = "Only letters and white space allowed";
+    if (!preg_match("/^[a-zA-Zก-อ\-' ]*$/",$name)) {
+      $nameErr = "อนุญาตให้ใช้ตัวอักษรและช่องว่างเท่านั้น";
     }
   }
-  
-  if (empty($_POST["email"])) {
-    $emailErr = "Email is required";
+
+  if (empty($_POST["nickname"])) {
+    $nicknameErr = "จำเป็นต้องกรอกชื่อเล่น";
   } else {
-    $email = test_input($_POST["email"]);
-    // check if e-mail address is well-formed
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-      $emailErr = "Invalid email format";
-    }
+    $nickname = test_input($_POST["nickname"]);
   }
-    
-  if (empty($_POST["website"])) {
-    $website = "";
+
+  if (empty($_POST["houseNo"])) {
+    $houseNoErr = "จำเป็นต้องกรอกเลขที่บ้าน";
   } else {
-    $website = test_input($_POST["website"]);
-    // check if URL address syntax is valid
-    if (!preg_match("/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i",$website)) {
-      $websiteErr = "Invalid URL";
-    }    
+    $houseNo = test_input($_POST["houseNo"]);
   }
 
   if (empty($_POST["comment"])) {
@@ -50,10 +75,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   }
 
   if (empty($_POST["gender"])) {
-    $genderErr = "Gender is required";
+    $genderErr = "จำเป็นต้องเลือกเพศ";
   } else {
     $gender = test_input($_POST["gender"]);
   }
+
+  $data = "Name: $name\nNickname: $nickname\nHouse No: $houseNo\nComment: $comment\nGender: $gender\n\n";
+  file_put_contents("data.txt", $data, FILE_APPEND);
 }
 
 function test_input($data) {
@@ -64,53 +92,28 @@ function test_input($data) {
 }
 ?>
 
-<h2>PHP Form Validation Example</h2>
-<p><span class="error">* required field</span></p>
+<h2>ตัวอย่างแบบฟอรมตรวจสอบข้อมูล PHP</h2>
+<p><span class="error">* จำเป็นต้องกรอกข้อมูล</span></p>
 <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">  
-  Name: <input type="text" name="name">
+  ชื่อ: <input type="text" name="name">
   <span class="error">* <?php echo $nameErr;?></span>
   <br><br>
-  E-mail: <input type="text" name="email">
-  <span class="error">* <?php echo $emailErr;?></span>
+  ชื่อเล่น: <input type="text" name="nickname">
+  <span class="error">* <?php echo $nicknameErr;?></span>
   <br><br>
-  Website: <input type="text" name="website">
-  <span class="error"><?php echo $websiteErr;?></span>
+  เลขบ้าน: <input type="text" name="houseNo">
+  <span class="error">* <?php echo $houseNoErr;?></span>
   <br><br>
-  Comment: <textarea name="comment" rows="5" cols="40"></textarea>
+  ข้อเห็นคิด: <textarea name="comment" rows="5" cols="40"></textarea>
   <br><br>
-  Gender:
-  <input type="radio" name="gender" value="female">Female
-  <input type="radio" name="gender" value="male">Male
-  <input type="radio" name="gender" value="other">Other
+  เพศ:
+  <input type="radio" name="gender" value="female">หญิง
+  <input type="radio" name="gender" value="male">ชาย
+  <input type="radio" name="gender" value="other">อื่น ๆ
   <span class="error">* <?php echo $genderErr;?></span>
   <br><br>
-  <input type="submit" name="submit" value="Submit">  
+  <input type="submit" name="submit" value="ส่งข้อมูล">  
+  <br> <a href=to.php>ถัดไป</a>
 </form>
-
-<?php
-echo "<h2>Your Input:</h2>";
-echo $name;
-echo "<br>";
-echo $email;
-echo "<br>";
-echo $website;
-echo "<br>";
-echo $comment;
-echo "<br>";
-echo $gender;
-?>
-<!DOCTYPE html>
-<html>
-<body>
-
-<?php
-$myfile = fopen("data.txt", "r") or die("Unable to open file!");
-while(!feof($myfile)) {
-  echo fgets($myfile) . "<br>";
-}
-fclose($myfile);
-?>
-</body>
-</html>
 </body>
 </html>
